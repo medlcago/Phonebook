@@ -4,11 +4,12 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).parent
+DEBUG = False
 
 
 class BaseConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-    debug: bool = Field(default=False, alias="DEBUG")
+    model_config = SettingsConfigDict(env_file=f"{BASE_DIR / '.env'}", extra="ignore")
+    debug: bool = Field(default=DEBUG, alias="DEBUG")
 
 
 class DbConfig(BaseConfig):
@@ -47,10 +48,17 @@ class ApiConfig(BaseConfig):
     base_url: str = Field(alias="BASE_URL")
 
 
-class Config(BaseConfig):
+class JWTConfig(BaseConfig):
+    jwt_secret: str = Field(alias="JWT_SECRET")
+    jwt_algorithm: str = Field(alias="JWT_ALGORITHM")
+    access_token_expire_minutes: int = 15
+
+
+class Config(BaseSettings):
     db: DbConfig = DbConfig()
     redis: RedisConfig = RedisConfig()
     api: ApiConfig = ApiConfig()
+    auth_jwt: JWTConfig = JWTConfig()
 
 
 config = Config()
