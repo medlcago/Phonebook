@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BaseUser(BaseModel):
@@ -15,3 +15,8 @@ class CreateUser(BaseUser):
 class ResponseUser(BaseUser):
     id: int
     user_id: UUID
+
+
+class UpdateUser(BaseUser):
+    username: str | None = Field(default=None)
+    fullname: str | None = Field(default=None)
