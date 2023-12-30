@@ -9,6 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import PyJWTError
 from pydantic import ValidationError
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.models import User
@@ -93,18 +94,20 @@ class AuthService:
         self.session = session
 
     async def register_new_user(self, user_data: CreateUser) -> Token:
-        user_id = uuid.uuid4()
-
-        user = User(
-            user_id=user_id,
-            fullname=user_data.fullname,
-            username=user_data.username,
-            password=self.hash_password(user_data.password).decode()
-        )
-        self.session.add(user)
-        await self.session.commit()
-        await self.session.refresh(user)
-        return self.create_token(user)
+        try:
+            user_id = uuid.uuid4()
+            user = User(
+                user_id=user_id,
+                fullname=user_data.fullname,
+                username=user_data.username,
+                password=self.hash_password(user_data.password).decode()
+            )
+            self.session.add(user)
+            await self.session.commit()
+            await self.session.refresh(user)
+            return self.create_token(user)
+        except IntegrityError:
+            raise HTTPException(status_code=409, detail="User already exists.")
 
     async def authenticate_user(self, username: str, password: str) -> Token:
         user = await self.session.scalar(select(User).filter_by(username=username))
