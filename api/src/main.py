@@ -1,6 +1,9 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from starlette.responses import RedirectResponse
+from starlette.staticfiles import StaticFiles
 
+from config import BASE_DIR
 from config import config
 from routers import auth_router
 from routers import entry_router
@@ -10,7 +13,17 @@ api_v1_prefix = config.api.api_v1_prefix
 
 app = FastAPI(title="Phone Book API")
 
-app.include_router(auth_router, prefix=api_v1_prefix)
+
+@app.get("/", include_in_schema=False)
+async def index(request: Request):
+    current_path = request.url.path
+    redirect_path = current_path + "docs"
+    return RedirectResponse(url=redirect_path, status_code=302)
+
+
+app.mount("/static", StaticFiles(directory=BASE_DIR / "templates/static"), name="static")
+
+app.include_router(auth_router)
 app.include_router(user_router, prefix=api_v1_prefix)
 app.include_router(entry_router, prefix=api_v1_prefix)
 
