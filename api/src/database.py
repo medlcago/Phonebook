@@ -30,4 +30,11 @@ async def delete_database():
 
 
 if __name__ == '__main__':
-    asyncio.run(create_database())
+    choice = input("1. Create database\n2. Delete database\n>>> ")
+    match choice:
+        case "1":
+            asyncio.run(create_database())
+        case "2":
+            asyncio.run(delete_database())
+        case _:
+            print("Invalid data")

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from fastapi.templating import Jinja2Templates
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -59,6 +60,7 @@ class Config(BaseSettings):
     redis: RedisConfig = RedisConfig()
     api: ApiConfig = ApiConfig()
     auth_jwt: JWTConfig = JWTConfig()
+    templates: Jinja2Templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 
 config = Config()

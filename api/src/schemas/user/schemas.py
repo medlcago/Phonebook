@@ -20,3 +20,8 @@ class ResponseUser(BaseUser):
 class UpdateUser(BaseUser):
     username: str | None = Field(default=None)
     fullname: str | None = Field(default=None)
+
+
+class LoginUser(BaseModel):
+    username: str
+    password: str

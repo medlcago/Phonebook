@@ -6,24 +6,32 @@
     <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
 </head>
 <body>
-    <div class="form-container">
-        <h2>Регистрация</h2>
+<div class="form-container">
+    <h2>Регистрация</h2>
+    <form id="registration-form">
         <div class="form-group">
-            <label for="register-username">Имя пользователя</label>
-            <input type="text" id="register-username" name="username">
+            <label for="register-username"></label>
+            <input type="text" id="register-username" name="username" required placeholder="Имя пользователя">
         </div>
         <div class="form-group">
-            <label for="register-password">Пароль</label>
-            <input type="password" id="register-password" name="password">
+            <label for="register-fullname"></label>
+            <input type="text" id="register-fullname" name="fullname" required placeholder="ФИО">
         </div>
         <div class="form-group">
-            <label for="register-confirm-password">Подтвердите пароль</label>
-            <input type="password" id="register-confirm-password" name="confirm-password">
+            <label for="register-password"></label>
+            <input type="password" id="register-password" name="password" required placeholder="Пароль">
+        </div>
+        <div class="form-group">
+            <label for="register-confirm-password"></label>
+            <input type="password" id="register-confirm-password" name="confirm-password" required
+                   placeholder="Подтвердите пароль">
         </div>
         <div class="form-group">
             <button type="submit">Зарегистрироваться</button>
         </div>
-        <p class="centered-text">Уже есть аккаунт? <a href="{{ url('login') }}">Войти</a></p>
-    </div>
+    </form>
+    <p class="centered-text">Уже есть аккаунт? <a href="{{ url('login') }}" class="no-underline">Войти</a></p>
+</div>
+<script src="{{ url_for('static', path='/register.js') }}"></script>
 </body>
 </html>

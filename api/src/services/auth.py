@@ -18,7 +18,7 @@ from database import get_db
 from schemas.auth import Token
 from schemas.user import CreateUser, ResponseUser
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/user/auth/sign-in")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/auth/sign-in")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> ResponseUser:
@@ -41,6 +41,13 @@ class AuthService:
 
     @classmethod
     def validate_token(cls, token: str) -> ResponseUser:
+        exp_401 = HTTPException(
+            status_code=401,
+            detail="Failed to verify login information.",
+            headers={
+                "WWW-Authenticate": "Bearer"
+            }
+        )
         try:
             payload = jwt.decode(
                 token,
@@ -48,24 +55,12 @@ class AuthService:
                 algorithms=[config.auth_jwt.jwt_algorithm]
             )
         except PyJWTError:
-            raise HTTPException(
-                status_code=401,
-                detail="Failed to verify login information.",
-                headers={
-                    "WWW-Authenticate": "Bearer"
-                }
-            )
+            raise exp_401
         user = payload.get("user")
         try:
             user = ResponseUser.model_validate(user)
         except ValidationError:
-            raise HTTPException(
-                status_code=401,
-                detail="Failed to verify login information.",
-                headers={
-                    "WWW-Authenticate": "Bearer"
-                }
-            )
+            raise exp_401
         return user
 
     @classmethod
@@ -111,21 +106,16 @@ class AuthService:
 
     async def authenticate_user(self, username: str, password: str) -> Token:
         user = await self.session.scalar(select(User).filter_by(username=username))
-        if user is None:
-            raise HTTPException(
-                status_code=401,
-                detail="Incorrect username or password.",
-                headers={
-                    "WWW-Authenticate": "Bearer"
-                }
-            )
-        if not self.verify_password(password, user.password.encode()):
-            raise HTTPException(
-                status_code=401,
-                detail="Incorrect username or password.",
-                headers={
-                    "WWW-Authenticate": "Bearer"
-                }
-            )
+        exp_401 = HTTPException(
+            status_code=401,
+            detail="Incorrect username or password.",
+            headers={
+                "WWW-Authenticate": "Bearer"
+            }
+        )
 
+        if user is None:
+            raise exp_401
+        if not self.verify_password(password, user.password.encode()):
+            raise exp_401
         return self.create_token(user)

@@ -10,7 +10,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: var(--secondary-color);
+    background: linear-gradient(90deg, #f598a8, #f6edb2);
 }
 
 .centered-text {
@@ -62,4 +62,8 @@ body {
 
 .form-group button:hover {
     background-color: rgba(0, 0, 0, 0.1);
+}
+
+a.no-underline {
+    text-decoration: none;
 }

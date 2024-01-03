@@ -32,6 +32,9 @@ async def update_user(db: AsyncSession, user: ResponseUser, data: dict) -> User:
         stmt = update(User).filter_by(user_id=user_id).values(**data)
         result = await db.execute(stmt)
     except IntegrityError:
+        username = data.get("username", None)
+        if username:
+            raise HTTPException(status_code=409, detail=f"Username {username} already exists.")
         raise HTTPException(status_code=409, detail="Data integrity error")
 
     if result.rowcount == 0:

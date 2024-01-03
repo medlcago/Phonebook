@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
 
@@ -26,6 +27,20 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "templates/static"), name=
 app.include_router(auth_router)
 app.include_router(user_router, prefix=api_v1_prefix)
 app.include_router(entry_router, prefix=api_v1_prefix)
+
+origins = [
+    "http://localhost",
+    "http://localhost:8000"
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 if __name__ == '__main__':
     uvicorn.run(app, port=8080)
